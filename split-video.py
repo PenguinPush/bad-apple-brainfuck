@@ -1,9 +1,7 @@
 import ffmpeg
-import numpy as np
+import numpy
 
 source_video = 'assets/bad apple.mp4'
-video_frames = []
-video_frames_lowres = []
 
 probe = ffmpeg.probe(source_video)
 video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
@@ -11,40 +9,38 @@ video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
 width = video_info['width']
 height = video_info['height']
 
-process = (
-    ffmpeg.input(source_video, r=30)
-    .output('pipe:', format='rawvideo', pix_fmt='gray', vf='transpose=2')
-    .run_async(pipe_stdout=True)
-)
 
-process_lowres = (
-    ffmpeg.input(source_video, r=30)
-    .output('pipe:', format='rawvideo', pix_fmt='gray', vf='transpose=2, scale=iw/4:ih/4')
-    .run_async(pipe_stdout=True)
-)
+def process_frames(scale):
+    video_frames = []
 
-while True:
-    in_bytes = process.stdout.read(width * height)
-    if not in_bytes:
-        break
-    frame_array = np.frombuffer(in_bytes, np.uint8).reshape([width, height])
-    video_frames.append(frame_array)
+    process = (
+        ffmpeg.input(source_video, r=30)
+        .output('pipe:', format='rawvideo', pix_fmt='gray', vf=f'transpose=2, scale=iw/{scale}:ih/{scale}')
+        .run_async(pipe_stdout=True)
+    )
 
-while True:
-    in_bytes = process_lowres.stdout.read(width//4 * height//4)
-    if not in_bytes:
-        break
-    frame_array_lowres = np.frombuffer(in_bytes, np.uint8).reshape([width//4, height//4])
-    video_frames_lowres.append(frame_array_lowres)
+    while True:
+        in_bytes = process.stdout.read(width//scale * height//scale)
+        if not in_bytes:
+            break
+        frame_array = numpy.frombuffer(in_bytes, numpy.uint8).reshape([width // scale, height // scale])
+        video_frames.append(frame_array)
 
-process.wait()
+    process.wait()
 
-video_frames = np.array(video_frames)
-video_frames_lowres = np.array(video_frames_lowres)
+    video_frames = numpy.array(video_frames)
+    return video_frames
+
 ffmpeg.input(source_video).output("assets/video_audio.wav", format='wav').run()
 
-print("Video converted to numpy array with shape:", video_frames.shape)
-print("Video converted to numpy array with shape:", video_frames_lowres.shape)
+video_frames_x1 = process_frames(1)
+video_frames_x2 = process_frames(2)
+video_frames_x4 = process_frames(4)
 
-np.save("assets/video_frames.npy", video_frames)
-np.save("assets/video_frames_lowres.npy", video_frames_lowres)
+print("Video converted to numpy array with shape:", video_frames_x1.shape)
+print("Video converted to numpy array with shape:", video_frames_x2.shape)
+print("Video converted to numpy array with shape:", video_frames_x4.shape)
+
+numpy.save("assets/video_frames_x1.npy", video_frames_x1)
+numpy.save("assets/video_frames_x2.npy", video_frames_x2)
+numpy.save("assets/video_frames_x4.npy", video_frames_x4)

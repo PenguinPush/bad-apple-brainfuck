@@ -1,8 +1,8 @@
-import numpy as np
+import numpy
 import pygame
 
-video_frames = np.load("assets/video_frames.npy")
-video_frames = np.repeat(video_frames[:, :, :, np.newaxis], 3, axis=3)
+video_frames = numpy.load("assets/video_frames.npy")
+video_frames = numpy.repeat(video_frames[:, :, :, numpy.newaxis], 3, axis=3)
 
 pygame.init()
 screen = pygame.display.set_mode((480, 360))
