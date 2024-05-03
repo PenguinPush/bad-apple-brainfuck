@@ -1,13 +1,16 @@
 import ffmpeg
 import numpy
 
-source_video = 'assets/bad apple.mp4'
+source_video = "assets/bad apple.mp4"
 
 probe = ffmpeg.probe(source_video)
-video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
+video_info = next(s for s in probe["streams"] if s["codec_type"] == "video")
 
-width = video_info['width']
-height = video_info['height']
+width = video_info["width"]
+height = video_info["height"]
+
+# width = 480
+# height = 360
 
 
 def process_frames(scale):
@@ -15,15 +18,17 @@ def process_frames(scale):
 
     process = (
         ffmpeg.input(source_video, r=30)
-        .output('pipe:', format='rawvideo', pix_fmt='gray', vf=f'transpose=2, scale=iw/{scale}:ih/{scale}')
+        .output('pipe:', format="rawvideo", pix_fmt="gray",
+                vf=f"transpose=2, scale=iw/{scale}:ih/{scale}, setsar=1")
         .run_async(pipe_stdout=True)
     )
 
     while True:
-        in_bytes = process.stdout.read(width//scale * height//scale)
+        in_bytes = process.stdout.read(width // scale * height // scale)
         if not in_bytes:
             break
-        frame_array = numpy.frombuffer(in_bytes, numpy.uint8).reshape([width // scale, height // scale])
+        frame_array = numpy.frombuffer(in_bytes, numpy.uint8).reshape(
+            [width // scale, height // scale])
         video_frames.append(frame_array)
 
     process.wait()
@@ -31,7 +36,8 @@ def process_frames(scale):
     video_frames = numpy.array(video_frames)
     return video_frames
 
-ffmpeg.input(source_video).output("assets/video_audio.wav", format='wav').run()
+
+ffmpeg.input(source_video).output("assets/video audio.wav", format="wav").run()
 
 video_frames_x1 = process_frames(1)
 video_frames_x2 = process_frames(2)
