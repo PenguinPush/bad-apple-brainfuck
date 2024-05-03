@@ -1,7 +1,7 @@
 import numpy
 import pygame
 
-video_frames = numpy.load("assets/video_frames.npy")
+video_frames = numpy.load("assets/video_frames_x1.npy")
 video_frames = numpy.repeat(video_frames[:, :, :, numpy.newaxis], 3, axis=3)
 
 pygame.init()
