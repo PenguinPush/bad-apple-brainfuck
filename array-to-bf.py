@@ -14,13 +14,13 @@ for i in range(video_frames_x4.shape[0]):
     for k in range(video_frames_x4.shape[2]):
         for j in range(video_frames_x4.shape[1]):
             if video_frames_x4[i][j][k] > threshold + 42:
-                bf += "+++>+++>"
+                bf += "+++>"
             elif video_frames_x4[i][j][k] > threshold - 42:
-                bf += "+>+>"
+                bf += "+>"
             else:
-                bf += ">>"
+                bf += ">"
 
-            if j == video_frames_x4.shape[1] - 1:
+            if j == video_frames_x4.shape[1] - 1 or j == video_frames_x4.shape[1] // 2 - 1:
                 bf += "---------------------->"
 
     bf += "+[<+++++++++++++++++++++++++++++++++]>[-.>]"
@@ -28,15 +28,18 @@ for i in range(video_frames_x4.shape[0]):
     l = 0
     for k in range(video_frames_x2.shape[2]):
         for j in range(video_frames_x2.shape[1]):
-            if video_frames_x2[i][j][k] > threshold:
-                shaped += "##"
+            if video_frames_x2[i][j][k] > threshold + 84:
+                shaped += "#"
+            elif video_frames_x2[i][j][k] > threshold - 84:
+                if j % 2 == k % 2:
+                    shaped += " "
+                else:
+                    shaped += "#"
             else:
-                shaped += "  "
+                shaped += " "
 
-            if k == video_frames_x2.shape[1] - 1:
-                l += 1
-                if l % 2 == 0:
-                    shaped += "\n"
+            if k == video_frames_x2.shape[1] - 1 or k == video_frames_x2.shape[1]//2 - 1:
+                shaped += "\n"
 
     l = 0
     for j in range(len(shaped)):
@@ -49,9 +52,7 @@ for i in range(video_frames_x4.shape[0]):
                 bf_shaped += bf[shape_index]
                 shape_index += 1
             if (j + 1) % video_frames_x2.shape[1] == 0:
-                l += 1
-                if l % 2 == 0:
-                    bf_shaped += "\n"
+                bf_shaped += "\n"
 
     if shape_index < len(bf):
         bf_shaped += "\n" + bf[shape_index:-1] + bf[-1]

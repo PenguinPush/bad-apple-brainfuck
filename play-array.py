@@ -8,7 +8,7 @@ pygame.mixer.init()
 pygame.mixer.music.load("assets/video audio.wav")
 
 pygame.init()
-screen = pygame.display.set_mode((480, 360))
+screen = pygame.display.set_mode((480*2, 360))
 clock = pygame.time.Clock()
 
 

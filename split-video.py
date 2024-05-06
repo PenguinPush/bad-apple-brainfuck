@@ -6,8 +6,10 @@ source_video = "assets/bad apple.mp4"
 probe = ffmpeg.probe(source_video)
 video_info = next(s for s in probe["streams"] if s["codec_type"] == "video")
 
-width = video_info["width"]
+width = video_info["width"] * 2
 height = video_info["height"]
+
+print(width, height)
 
 # width = 480
 # height = 360
@@ -19,7 +21,7 @@ def process_frames(scale):
     process = (
         ffmpeg.input(source_video, r=30)
         .output('pipe:', format="rawvideo", pix_fmt="gray",
-                vf=f"transpose=2, scale=iw/{scale}:ih/{scale}, setsar=1")
+                vf=f"transpose=1, scale={height//scale}:{width//scale}:flags=lanczos:param0=1, setsar=1:1, hflip")
         .run_async(pipe_stdout=True)
     )
 
@@ -37,7 +39,7 @@ def process_frames(scale):
     return video_frames
 
 
-ffmpeg.input(source_video).output("assets/video audio.wav", format="wav").run()
+# ffmpeg.input(source_video).output("assets/video audio.wav", format="wav").run()
 
 video_frames_x1 = process_frames(1)
 video_frames_x2 = process_frames(2)
