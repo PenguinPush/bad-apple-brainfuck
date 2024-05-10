@@ -45,10 +45,10 @@ video_frames_x1 = process_frames(1)
 video_frames_x2 = process_frames(2)
 video_frames_x4 = process_frames(4)
 
-print("Video converted to numpy array with shape:", video_frames_x1.shape)
-print("Video converted to numpy array with shape:", video_frames_x2.shape)
-print("Video converted to numpy array with shape:", video_frames_x4.shape)
-
 numpy.save("assets/video_frames_x1.npy", video_frames_x1)
 numpy.save("assets/video_frames_x2.npy", video_frames_x2)
 numpy.save("assets/video_frames_x4.npy", video_frames_x4)
+
+print("Video converted to numpy array with shape:", video_frames_x1.shape)
+print("Video converted to numpy array with shape:", video_frames_x2.shape)
+print("Video converted to numpy array with shape:", video_frames_x4.shape)
